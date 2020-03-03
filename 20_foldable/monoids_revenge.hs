@@ -21,7 +21,6 @@ xs = [Just 1, Nothing, Just 5]
 foldMap First xs                -- => First {getFirst = Just 1}
 foldMap Last xs                 -- => Last {getLast = Just 5}
 
-
 -- 5 * 10 * 15
 foldMap (*5) map Product [1..3] -- => Product {getProduct = 750}
 -- 5 + 10 + 15

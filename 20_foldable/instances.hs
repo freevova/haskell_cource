@@ -8,7 +8,6 @@ instance Foldable Identity where
   foldl f z (Identity x) = f z x
   foldMap f (Identity x) = f x
 
-
 a1 = foldr (*) 1 (Identity 5)   -- => 5
 a2 = foldl (*) 5 (Identity 5)   -- => 25
 
