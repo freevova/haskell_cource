@@ -1,0 +1,60 @@
+class Functor f where
+[1]   [2]    [3] [4]
+  fmap :: (a -> b) -> f a -> f b
+  [5]     [6]         [7]    [8]
+1. class is the keyword to begin the definition of a type class.
+2. Functor is the name of the type class we are defining.
+3. Type classes in Haskell usually refer to a type. The letters them-
+selves, as with type variables in type signatures, do not mean
+anything special. f is a conventional letter to choose when refer-
+ring to types that have functorial structure. The f must be the
+same f throughout the type class definition.
+4. The where keyword ends the declaration of the type class name
+and associated types. After the where the operations provided by
+the type class are listed.
+5. We begin the declaration of an operation named fmap.
+6. The argument a -> b is any Haskell function of that type (re-
+membering that it could be an (a -> a) function for this pur-
+pose).
+7. The argument f a is a Functor f that takes a type argument a.
+That is, the f is a type that has an instance of the Functor type
+class.
+8. The return value is f b. It is the same f from f a, while the type
+argument b possibly but not necessarily refers to a different type.
+
+
+Prelude> fmap (+1) (Just 1)
+Just 2
+
+Prelude> fmap (10/) (4, 5)
+(4,2.0)
+
+Prelude> :set -XTypeApplications
+Prelude> :type fmap @Maybe
+  fmap @Maybe :: (a -> b) -> Maybe a -> Maybe b
+Prelude> :type fmap @(Either _)
+  fmap @(Either _) :: (a -> b) -> Either t a -> Either t b
+
+
+
+(<$>) :: Functor f => (a -> b) -> f a -> f b
+($) :: (a -> b) -> a -> b
+
+
+1. FUNCTOR LAWS:
+  Identity:
+  fmap id == id
+
+  Prelude> fmap id "Hi Julie"
+  "Hi Julie"
+  Prelude> id "Hi Julie"
+  "Hi Julie"
+
+2. Composition
+  fmap (f . g) == fmap f . fmap g
+
+  Prelude> fmap ((+1) . (*2)) [1..5]
+  [3,5,7,9,11]
+  Prelude> fmap (+1) . fmap (*2) $ [1..5]
+  [3,5,7,9,11]
+

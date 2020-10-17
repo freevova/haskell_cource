@@ -1,0 +1,150 @@
+
+A monoid is a binary associative operation with an identity.
+[1]           [2]    [3]         [4]               [5]
+1. The thing we’re talking about – monoids. That’ll end up being
+the name of our type class.
+
+2. Binary, i.e., two. So, there will be two of something.
+
+3. Associative – this is a property or law that must be satisfied.
+You’ve seen associativity with addition and multiplication. We’ll
+explain it more in a moment.
+
+4. Operation – so called because in mathematics, it’s usually used
+as an infix operator. You can read this interchangeably as “func-
+tion.” Note that given the mention of “binary” earlier, we know
+that this is a function of two arguments.
+
+5. Identity is one of those words in mathematics that pops up a
+lot. In this context, we can take this to mean there’ll be some
+value which, when combined with any other value, will always
+return that other value. This can be seen most immediately
+with examples.
+
+For lists, we have a binary operator, (++), that joins two lists
+together. We can also use a function, mappend, from the Monoid
+type class to do the same thing:
+
+Prelude> mappend [1, 2, 3] [4, 5, 6]
+[1,2,3,4,5,6]
+
+mappend [1..5] [] = [1..5]
+mappend [] [1..5] = [1..5]
+
+
+In plain English, a monoid is a function that takes two arguments
+and follows two laws: associativity and identity.
+
+
+class Semigroup m => Monoid m where
+  mempty :: m
+  mappend :: m -> m -> m
+  mconcat :: [m] -> m
+  mconcat = foldr mappend mempty
+
+
+Integer doesn’t have a Monoid!
+import Data.Monoid
+Prelude> mappend (Sum 1) (Sum 5)
+Sum {getSum = 6}
+Prelude> mappend (Product 5) (Product 5)
+Product {getProduct = 25}
+Prelude> mappend (Sum 4.5) (Sum 3.4)
+Sum {getSum = 7.9}
+
+
+
+Prelude> Sum 1 <> Sum 1 <> Sum 1
+Sum {getSum = 3}
+
+Prelude> mconcat [Sum 8, Sum 9, Sum 10]
+Sum {getSum = 27}
+
+
+foldr mappend mempty ([2, 4, 6] :: [Product Int])
+Product {getProduct = 48}
+
+
+LAWS:
+1. Identity
+  -- left identity
+  mappend mempty x = x
+
+  -- right identity
+  mappend x mempty = x
+
+2. associativity
+  mappend x (mappend y z) = mappend (mappend x y) z
+
+  mconcat = foldr mappend mempty
+
+
+
+Different instance, same representation:
+BOOLEAN:
+Prelude> import Data.Monoid
+
+Prelude> All True <> All True
+  All {getAll = True}
+Prelude> All True <> All False
+  All {getAll = False}
+
+Prelude> Any True <> Any False
+  Any {getAny = True}
+Prelude> Any False <> Any False
+  Any {getAny = False}
+
+MAYBE:
+Prelude> First (Just 1) `mappend` First (Just 2)
+First {getFirst = Just 1}
+
+Prelude> Last (Just 1) `mappend` Last (Just 2)
+Last {getLast = Just 2}
+
+Prelude> Last Nothing `mappend` Last (Just 2)
+Last {getLast = Just 2}
+
+Prelude> First Nothing `mappend` First (Just 2)
+First {getFirst = Just 2}
+
+Prelude> First Nothing `mappend` First Nothing
+First {getFirst = Nothing}
+
+Prelude> Last Nothing `mappend` Last Nothing
+Last {getLast = Nothing}
+
+
+ASSOCIATIVITY:
+this works:
+Prelude> evilPlus = flip (+)
+Prelude> 76 + 67
+143
+Prelude> 76 `evilPlus` 67
+143
+
+this not:
+Prelude> evilPlusPlus = flip (++)
+Prelude> oneList = [1..3]
+Prelude> otherList = [4..6]
+Prelude> oneList ++ otherList
+[1,2,3,4,5,6]
+Prelude> oneList `evilPlusPlus` otherList
+[4,5,6,1,2,3]
+
+IDENTITY
+this works:
+
+Prelude>
+ 1 + 0
+1
+Prelude>
+ 521 + 0
+521
+Prelude>
+ 1 * 1
+1
+Prelude>
+ 521 * 1
+521
+Zero is the identity value for addition, while 1 is the identity value
+for multiplication
